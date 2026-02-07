@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Learning Clock Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
+
+/* 🌌 BACKGROUND */
+body{
+  height:100vh;
+  background:
+   radial-gradient(circle at 20% 30%,#2a004d,transparent),
+   radial-gradient(circle at 80% 70%,#001f4d,transparent),
+   #000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#fff;
+}
+
+/* 🔐 PATTERN */
+.lock{text-align:center}
+.pattern{
+  display:grid;
+  grid-template-columns:repeat(3,80px);
+  gap:15px;
+}
+.dot{
+  width:80px;height:80px;
+  border-radius:50%;
+  border:3px solid #ff9800;
+  cursor:pointer;
+}
+.dot.active{background:#ff9800}
+
+/* ⏰ CLOCK */
+.clockBox{display:none;text-align:center}
+.clock{
+  width:520px;height:520px;
+  border-radius:50%;
+  background:conic-gradient(
+    #ff1744,#ff9100,#ffee00,#00e676,
+    #00e5ff,#2979ff,#d500f9,#ff1744
+  );
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  box-shadow:0 0 80px rgba(255,255,255,.4);
+}
+.inner{
+  width:380px;height:380px;
+  background:#fff;
+  border-radius:50%;
+  position:relative;
+}
+
+/* 🔢 NUMBERS FIXED */
+.number{
+  position:absolute;
+  width:100%;height:100%;
+  transform:rotate(var(--r));
+}
+.number span{
+  position:absolute;
+  top:12px;
+  left:50%;
+  transform:translateX(-50%) rotate(calc(-1 * var(--r)));
+  font-size:26px;
+  font-weight:600;
+  color:#111;
+}
+
+/* HANDS */
+.hand{
+  position:absolute;
+  top:50%;left:50%;
+  transform-origin:0% 50%;
+}
+.hour{width:30%;height:6px;background:#000}
+.minute{width:42%;height:4px;background:red}
+.second{width:46%;height:2px;background:#2979ff}
+
+.center{
+  width:14px;height:14px;
+  background:#000;
+  border-radius:50%;
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+}
+
+/* QUIZ */
+.quiz{
+  margin-top:20px;
+  background:rgba(255,255,255,.1);
+  padding:15px;
+  border-radius:15px;
+}
+.quiz button{
+  margin:5px;
+  padding:8px 14px;
+  border:none;
+  border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔐 LOCK -->
+<div class="lock" id="lock">
+  <h2>🔐 Draw Pattern</h2>
+  <div class="pattern">
+    <div class="dot" data-n="1"></div>
+    <div class="dot" data-n="2"></div>
+    <div class="dot" data-n="3"></div>
+    <div class="dot" data-n="4"></div>
+    <div class="dot" data-n="5"></div>
+    <div class="dot" data-n="6"></div>
+    <div class="dot" data-n="7"></div>
+    <div class="dot" data-n="8"></div>
+    <div class="dot" data-n="9"></div>
+  </div>
+  <p>Pattern: 1 → 5 → 9</p>
+</div>
+
+<!-- ⏰ CLOCK -->
+<div class="clockBox" id="clockBox">
+  <div class="clock">
+    <div class="inner">
+
+      <!-- NUMBERS -->
+      <script>
+        for(let i=1;i<=12;i++){
+          document.write(`
+            <div class="number" style="--r:${i*30}deg">
+              <span>${i}</span>
+            </div>
+          `)
+        }
+      </script>
+
+      <!-- HANDS -->
+      <div class="hand hour" id="hour"></div>
+      <div class="hand minute" id="minute"></div>
+      <div class="hand second" id="second"></div>
+      <div class="center"></div>
+    </div>
+  </div>
+
+  <div class="quiz">
+    <p id="qText">⏰ Time batao</p>
+    <div id="options"></div>
+  </div>
+</div>
+
+<audio id="tick" src="https://actions.google.com/sounds/v1/alarms/clock_tick.ogg"></audio>
+
+<script>
+/* 🔐 PATTERN */
+let input="";
+document.querySelectorAll('.dot').forEach(d=>{
+  d.onclick=()=>{
+    input+=d.dataset.n;
+    d.classList.add("active");
+    if(input==="159"){
+      lock.style.display="none";
+      clockBox.style.display="block";
+    }
+    if(input.length>=3 && input!=="159"){
+      input="";
+      document.querySelectorAll('.dot').forEach(x=>x.classList.remove("active"));
+    }
+  }
+});
+
+/* ⏰ CLOCK */
+function runClock(){
+  const now=new Date();
+  const s=now.getSeconds();
+  const m=now.getMinutes();
+  const h=now.getHours()%12;
+
+  second.style.transform=`rotate(${s*6}deg)`;
+  minute.style.transform=`rotate(${m*6}deg)`;
+  hour.style.transform=`rotate(${h*30+m*0.5}deg)`;
+  tick.play();
+}
+setInterval(runClock,1000);
+runClock();
+</script>
+
+</body>
+</html>
